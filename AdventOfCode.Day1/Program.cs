@@ -2,6 +2,7 @@
 
 using Day1;
 using Day2;
+using Day3;
 using Spectre.Console;
 
 public class Program
@@ -12,7 +13,7 @@ public class Program
 
         var day = AnsiConsole.Prompt(
             new SelectionPrompt<int>()
-                .AddChoices(Enumerable.Range(1, 2))
+                .AddChoices(Enumerable.Range(1, 3))
                 .Title("Day")
                 .MoreChoicesText("More days available down below")
         );
@@ -31,6 +32,8 @@ public class Program
                 return new CaloriePuzzleSolver();
             case 2:
                 return new RockPaperScissorsSolver();
+            case 3:
+                return new RucksackSolver();
             default:
                 throw new NotImplementedException("This day has not been implemented yet");
         }
