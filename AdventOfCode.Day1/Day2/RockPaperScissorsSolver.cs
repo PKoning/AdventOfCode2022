@@ -7,39 +7,37 @@
             int totalScore = 0;
             await foreach (string line in File.ReadLinesAsync(inputPath))
             {
-                RockPaperScissorsType opponent = line[0].ToRockPaperScissorsType();
-                RockPaperScissorsType player = line[2].ToRockPaperScissorsType();
-                int score = DetermineScore(player, opponent);
-                totalScore += score;
+                var opponent = line[0].ToRockPaperScissorsType();
+                var outcome = line[2].ToPlayOutcome();
+                totalScore += (int)outcome;
+
+                var player = DetermineHand(opponent, outcome);
                 totalScore += (int)player;
             }
 
             return totalScore.ToString();
         }
 
-        /// <summary>
-        /// Determine the score between two 
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="opponent"></param>
-        /// <returns></returns>
-        private int DetermineScore(RockPaperScissorsType player, RockPaperScissorsType opponent)
+        private static RockPaperScissorsType DetermineHand(RockPaperScissorsType opponent, PlayOutcome outcome)
         {
-            // It's a draw
-            if (player == opponent)
+            if (outcome == PlayOutcome.Draw)
             {
-                return 3;
+                return opponent;
             }
 
-            // Player wins
-            if ((player == RockPaperScissorsType.Rock && opponent == RockPaperScissorsType.Scissors) ||
-                (player == RockPaperScissorsType.Scissors && opponent == RockPaperScissorsType.Paper) ||
-                (player == RockPaperScissorsType.Paper && opponent == RockPaperScissorsType.Rock))
-            {
-                return 6;
-            }
+            var playerWins = outcome == PlayOutcome.Win;
 
-            return 0;
+            switch (opponent)
+            {
+                case RockPaperScissorsType.Paper:
+                    return playerWins ? RockPaperScissorsType.Scissors : RockPaperScissorsType.Rock;
+                case RockPaperScissorsType.Scissors:
+                    return playerWins ? RockPaperScissorsType.Rock : RockPaperScissorsType.Paper;
+                case RockPaperScissorsType.Rock:
+                    return playerWins ? RockPaperScissorsType.Paper : RockPaperScissorsType.Scissors;
+                default:
+                    throw new ArgumentOutOfRangeException($"{opponent} is not a valid type");
+            }
         }
     }
 }
