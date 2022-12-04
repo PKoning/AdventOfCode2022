@@ -15,5 +15,11 @@
         {
             return Start <= other.Start && End >= other.End;
         }
+
+        internal bool Overlaps(Section other)
+        {
+            return (Start <= other.Start && End >= other.Start && End <= other.End) ||
+                   (Start >= other.Start && Start <= other.End && End >= other.End);
+        }
     }
 }

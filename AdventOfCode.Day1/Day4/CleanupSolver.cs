@@ -12,7 +12,8 @@
                 Section firstSection = GetSection(assignments.First);
                 Section secondSection = GetSection(assignments.Second);
 
-                if (firstSection.Contains(secondSection) || secondSection.Contains(firstSection))
+                if (firstSection.Contains(secondSection) || secondSection.Contains(firstSection) ||
+                    firstSection.Overlaps(secondSection) || secondSection.Overlaps(firstSection))
                 {
                     totalIncludedSections++;
                 }
