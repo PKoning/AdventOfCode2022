@@ -6,10 +6,10 @@
     {
         async Task<string> IPuzzleSolver.SolvePuzzleAsync(string inputPath)
         {
-            List<string> stackInput = new List<string>();
+            List<string> stackInput = new();
             bool readStacks = false;
 
-            List<Stack<char>>? stacks = null;
+            List<List<char>>? stacks = null;
 
             await foreach (string line in File.ReadLinesAsync(inputPath))
             {
@@ -34,10 +34,10 @@
                             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                             .Select(int.Parse)
                             .Last();
-                        stacks = new List<Stack<char>>(numberOfStacks);
+                        stacks = new List<List<char>>(numberOfStacks);
                         for (int i = 0; i < numberOfStacks; i++)
                         {
-                            stacks.Add(new Stack<char>());
+                            stacks.Add(new List<char>());
                         }
 
                         ReadIntoStacks(stackInput, stacks);
@@ -48,27 +48,13 @@
                 else
                 {
                     (int Amount, int FromIndex, int ToIndex) move = ParseMoveInput(line);
-                    for (int i = 0; i < move.Amount; i++)
-                    {
-                        if (stacks![move.FromIndex].TryPop(out var crate))
-                        {
-                            stacks[move.ToIndex].Push(crate);
-                        }
-                    }
+                    var crates = stacks![move.FromIndex].Take(move.Amount);
+                    stacks[move.ToIndex].InsertRange(0, crates);
+                    stacks[move.FromIndex].RemoveRange(0, move.Amount);
                 }
             }
 
-            var stackCount = stacks!.Count;
-            var answer = new List<char>(stackCount);
-            for (int i = 0; i < stackCount; i++)
-            {
-                if (stacks[i].TryPop(out var crate))
-                {
-                    answer.Add(crate);
-                }
-            }
-
-            return new string(answer.ToArray());
+            return new string(stacks!.Select(s => s.FirstOrDefault()).ToArray());
         }
 
         private static (int Amount, int FromIndex, int ToIndex) ParseMoveInput(string input)
@@ -82,7 +68,7 @@
             throw new InvalidOperationException("Moving input does not have 3 parts");
         }
 
-        private static void ReadIntoStacks(List<string> stackInput, List<Stack<char>> stacks)
+        private static void ReadIntoStacks(List<string> stackInput, List<List<char>> stacks)
         {
             int numberOfStacks = stacks.Count;
             for (int i = stackInput.Count - 1; i >= 0; i--)
@@ -93,7 +79,7 @@
                     char crateValue = input[(j * 3) + j + 1];
                     if (crateValue != ' ')
                     {
-                        stacks[j].Push(crateValue);
+                        stacks[j].Insert(0, crateValue);
                     }
                 }
             }
